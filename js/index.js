@@ -162,20 +162,58 @@ $(document).ready(function () {
     $("#addTodo").click();
   });
 
+  // Variables to store current todo being deleted
+  let currentDeleteTodoId = null;
+  let currentDeleteTodoText = null;
+
   //add event listener to the delete button
   //Need to use event delegation since the delete button is dynamically created
   $(document).on("click", ".deleteTodo", async function () {
-    // Get the id of the todo to be deleted
+    // Get the id and text of the todo to be deleted
     const id = $(this).data("index");
-    console.log("deleting", { id });
+    const todoText = $(this).closest("li").find(".todo-text").text();
 
-    // Delete the todo from the server
-    await fetch(`${BASE_URL}/todos/${id}`, {
-      method: "DELETE",
-    });
+    // Store current todo info for later use
+    currentDeleteTodoId = id;
+    currentDeleteTodoText = todoText;
 
-    // Re-render the todos by calling the render function
-    render();
+    // Populate the modal with current todo text
+    $("#deleteTaskText").text(todoText);
+
+    // Show the confirmation modal
+    const deleteModal = new bootstrap.Modal(
+      document.getElementById("deleteConfirmModal")
+    );
+    deleteModal.show();
+  });
+
+  // Handle confirm delete button click in the modal
+  $("#confirmDeleteTodo").click(async function () {
+    try {
+      // Delete the todo from the server
+      await fetch(`${BASE_URL}/todos/${currentDeleteTodoId}`, {
+        method: "DELETE",
+      });
+
+      // Hide the modal
+      const deleteModal = bootstrap.Modal.getInstance(
+        document.getElementById("deleteConfirmModal")
+      );
+      deleteModal.hide();
+
+      // Reset current todo variables
+      currentDeleteTodoId = null;
+      currentDeleteTodoText = null;
+
+      // Show success message
+      showAlert("Task deleted successfully!", "success");
+
+      // Re-render the todos by calling the render function
+      render();
+    } catch (error) {
+      console.error("Error deleting todo:", error);
+      showAlert("Error deleting task. Please try again.");
+    }
   });
 
   //add event listener to the toggleTodo button

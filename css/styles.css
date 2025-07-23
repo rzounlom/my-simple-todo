@@ -344,3 +344,37 @@ body {
 .btn-close:hover {
   opacity: 1;
 }
+
+/* Delete Confirmation Modal Styling */
+#deleteConfirmModal .modal-header {
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  color: #dc2626;
+  border-bottom: 1px solid #fecaca;
+}
+
+#deleteConfirmModal .modal-title {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+#deleteConfirmModal .modal-body {
+  background: #fefefe;
+}
+
+#deleteConfirmModal .bg-light {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+  border: 1px solid #e2e8f0;
+}
+
+#deleteConfirmModal .btn-danger {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  border: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+#deleteConfirmModal .btn-danger:hover {
+  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
