@@ -3,35 +3,75 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>To-Do List</title>
+    <title>Task Manager</title>
     <!-- Bootstrap CSS -->
     <link
       rel="stylesheet"
       href="node_modules/bootstrap/dist/css/bootstrap.min.css"
     />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/styles.css" />
   </head>
   <body>
-    <div class="container mt-5">
-      <h1 class="text-center">To-Do List</h1>
-      <div class="input-group mb-3">
-        <form id="todoForm">
-          <input
-            type="text"
-            id="newTodo"
-            class="form-control"
-            placeholder="Add a new to-do"
-            required
-          />
-          <button class="btn btn-primary" id="addTodo" type="submit">
-            Add
-          </button>
-        </form>
-      </div>
-      <ul class="list-group" id="todoList">
-        <!-- To-Do items will be appended here -->
-        <!-- <li
+    <div class="app-container">
+      <div class="container">
+        <div class="todo-app">
+          <div class="app-header">
+            <h1 class="app-title">
+              <i class="fas fa-check-circle"></i>
+              Task Manager
+            </h1>
+            <p class="app-subtitle">Organize your life, one task at a time</p>
+          </div>
+
+          <div class="input-section">
+            <!-- Alert Container -->
+            <div id="alertContainer" class="mb-3" style="display: none">
+              <div
+                class="alert alert-danger alert-dismissible fade show"
+                role="alert"
+              >
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span id="alertMessage">Please enter a task description.</span>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="alert"
+                  aria-label="Close"
+                ></button>
+              </div>
+            </div>
+
+            <form id="todoForm" class="todo-form">
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="newTodo"
+                  class="form-control todo-input"
+                  placeholder="What needs to be done?"
+                  required
+                />
+                <button
+                  class="btn btn-primary add-btn"
+                  id="addTodo"
+                  type="submit"
+                >
+                  <i class="fas fa-plus"></i>
+                  Add Task
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="todo-container">
+            <ul class="todo-list" id="todoList">
+              <!-- To-Do items will be appended here -->
+              <!-- <li
           class="list-group-item d-flex justify-content-between align-items-center"
         >
           <span class="todo-text completed">completed</span>
@@ -88,7 +128,58 @@
             </button>
           </div>
         </li> -->
-      </ul>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Todo Modal -->
+    <div
+      class="modal fade"
+      id="editTodoModal"
+      tabindex="-1"
+      aria-labelledby="editTodoModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editTodoModalLabel">Edit Todo</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="editTodoForm">
+              <div class="mb-3">
+                <label for="editTodoInput" class="form-label">Todo Text</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="editTodoInput"
+                  required
+                />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button type="button" class="btn btn-primary" id="saveEditTodo">
+              Save Changes
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- jQuery and Bootstrap JS -->

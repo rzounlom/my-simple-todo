@@ -1,28 +1,18 @@
 {
   "todos": [
     {
-      "id": "1",
-      "text": "Walk",
-      "completed": false
-    },
-    {
-      "id": "b2f0",
-      "text": "Clean room",
-      "completed": true
-    },
-    {
-      "id": "e6f0",
-      "text": "Do homework",
-      "completed": true
-    },
-    {
       "id": "3d3c",
-      "text": "Walk the dog",
+      "text": "clean room",
       "completed": false
     },
     {
-      "id": "6f65",
-      "text": "cool",
+      "id": "b098",
+      "text": "learn JavaScript",
+      "completed": false
+    },
+    {
+      "id": "e704",
+      "text": "walk the dog",
       "completed": false
     }
   ]

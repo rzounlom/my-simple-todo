@@ -63,22 +63,35 @@ $(document).ready(function () {
 
     // Loop through the todos array and append each todo to the list
     todos.forEach(function (todo, index) {
-      let todoItem = `<li class="list-group-item d-flex justify-content-between align-items-center">
+      let todoItem = `<li>
                                   <span class="todo-text ${
                                     todo.completed ? "completed" : ""
                                   }">${todo.text}</span>
-                                  <div>
-                                      <button class="btn btn-sm btn-secondary editTodo" data-index="${
+                                  <div class="todo-actions">
+                                      <button class="btn editTodo" data-index="${
                                         todo.id
-                                      }">Edit</button>
-                                      <button class="btn btn-sm btn-success toggleTodo" data-index="${
+                                      }">
+                                        <i class="fas fa-edit"></i>
+                                        Edit
+                                      </button>
+                                      <button class="btn toggleTodo" data-index="${
                                         todo.id
-                                      }">${
-        todo.completed ? "Incomplete" : "Complete"
-      }</button>
-                                      <button class="btn btn-sm btn-danger deleteTodo" data-index="${
+                                      }">
+                                        <i class="fas fa-${
+                                          todo.completed ? "undo" : "check"
+                                        }"></i>
+                                        ${
+                                          todo.completed
+                                            ? "Incomplete"
+                                            : "Complete"
+                                        }
+                                      </button>
+                                      <button class="btn deleteTodo" data-index="${
                                         todo.id
-                                      }">Delete</button>
+                                      }">
+                                        <i class="fas fa-trash"></i>
+                                        Delete
+                                      </button>
                                   </div>
                               </li>`;
       $("#todoList").append(todoItem);
@@ -88,23 +101,52 @@ $(document).ready(function () {
   // Call the render function when the page loads
   render();
 
+  // Function to show Bootstrap alert
+  const showAlert = (message, type = "danger") => {
+    const alertContainer = $("#alertContainer");
+    const alertDiv = alertContainer.find(".alert");
+    const alertMessage = $("#alertMessage");
+
+    // Update alert type and message
+    alertDiv
+      .removeClass("alert-danger alert-success alert-warning alert-info")
+      .addClass(`alert-${type}`);
+    alertMessage.text(message);
+
+    // Show the alert container
+    alertContainer.show();
+
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+      hideAlert();
+    }, 5000);
+  };
+
+  // Function to hide Bootstrap alert
+  const hideAlert = () => {
+    $("#alertContainer").hide();
+  };
+
   //add event listener to the add todo button
   $("#addTodo").click(async (event) => {
     event.preventDefault();
     //get the value of the input field
-    const text = $("#newTodo").val();
+    const text = $("#newTodo").val().trim();
     // console.log({ text });
 
     if (!text) {
-      alert("Please enter a todo");
+      showAlert("Please enter a task description.");
       return;
     }
 
     //add the todo to the server
     try {
       await addTodo(text);
+      // Show success message
+      showAlert("Task added successfully!", "success");
     } catch (error) {
       console.log(error);
+      showAlert("Error adding task. Please try again.");
     } finally {
       //clear the input field regardless of the outcome
       $("#newTodo").val("");
@@ -112,6 +154,12 @@ $(document).ready(function () {
 
     //re-render the todos by calling the render function
     render();
+  });
+
+  // Handle form submission (when user presses Enter)
+  $("#todoForm").submit(async function (event) {
+    event.preventDefault();
+    $("#addTodo").click();
   });
 
   //add event listener to the delete button
@@ -152,32 +200,77 @@ $(document).ready(function () {
     render();
   });
 
+  // Variables to store current todo being edited
+  let currentEditTodoId = null;
+  let currentEditTodo = null;
+
   //add event listener to the editTodo button
   //Need to use event delegation since the editTodo button is dynamically created
   $(document).on("click", ".editTodo", async function () {
-    // Get the id of the todo to be deleted
+    // Get the id of the todo to be edited
     const id = $(this).data("index");
     // fetch the todo from the server
     const todo = await fetchTodo(id);
-    let todoTextElement = $(this).closest("li").find(".todo-text");
-    const newText = prompt("Edit your to-do:", todo.text);
 
-    console.log("editing", { id, todoTextElement, newText });
+    // Store current todo info for later use
+    currentEditTodoId = id;
+    currentEditTodo = todo;
+
+    // Populate the modal with current todo text
+    $("#editTodoInput").val(todo.text);
+
+    // Show the modal
+    const editModal = new bootstrap.Modal(
+      document.getElementById("editTodoModal")
+    );
+    editModal.show();
+  });
+
+  // Handle save button click in the modal
+  $("#saveEditTodo").click(async function () {
+    const newText = $("#editTodoInput").val().trim();
 
     if (!newText) {
+      showAlert("Please enter a task description.");
       return;
     }
 
-    await fetch(`${BASE_URL}/todos/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      // toggle the todo status to bo the opposite of what it currently is
-      body: JSON.stringify({ ...todo, text: newText }),
-    });
+    try {
+      await fetch(`${BASE_URL}/todos/${currentEditTodoId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...currentEditTodo, text: newText }),
+      });
 
-    // Re-render the todos by calling the render function
-    render();
+      // Hide the modal
+      const editModal = bootstrap.Modal.getInstance(
+        document.getElementById("editTodoModal")
+      );
+      editModal.hide();
+
+      // Clear the form
+      $("#editTodoInput").val("");
+
+      // Reset current todo variables
+      currentEditTodoId = null;
+      currentEditTodo = null;
+
+      // Show success message
+      showAlert("Task updated successfully!", "success");
+
+      // Re-render the todos by calling the render function
+      render();
+    } catch (error) {
+      console.error("Error updating todo:", error);
+      showAlert("Error updating task. Please try again.");
+    }
+  });
+
+  // Handle form submission in the modal (when user presses Enter)
+  $("#editTodoForm").submit(function (e) {
+    e.preventDefault();
+    $("#saveEditTodo").click();
   });
 });
